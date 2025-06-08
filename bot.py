@@ -1,7 +1,8 @@
 import os
 import asyncio
-from aiogram import Bot, Dispatcher, types
+from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
+from aiogram.client.default import DefaultBotProperties
 from aiogram.types import Message
 from dotenv import load_dotenv
 import openai
@@ -11,8 +12,11 @@ load_dotenv()
 TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
-# Initialize
-bot = Bot(token=TELEGRAM_TOKEN, parse_mode=ParseMode.HTML)
+# Initialize bot and dispatcher
+bot = Bot(
+    token=TELEGRAM_TOKEN,
+    default=DefaultBotProperties(parse_mode=ParseMode.HTML)
+)
 dp = Dispatcher()
 openai.api_key = OPENAI_API_KEY
 
