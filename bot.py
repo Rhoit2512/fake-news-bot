@@ -1,5 +1,8 @@
 import os
-from aiogram import Bot, Dispatcher, types, executor
+import asyncio
+from aiogram import Bot, Dispatcher, types
+from aiogram.enums import ParseMode
+from aiogram.types import Message
 from dotenv import load_dotenv
 import openai
 
@@ -9,12 +12,12 @@ TELEGRAM_TOKEN = os.getenv("TELEGRAM_TOKEN")
 OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
 
 # Initialize
-bot = Bot(token=TELEGRAM_TOKEN)
-dp = Dispatcher(bot)
+bot = Bot(token=TELEGRAM_TOKEN, parse_mode=ParseMode.HTML)
+dp = Dispatcher()
 openai.api_key = OPENAI_API_KEY
 
-@dp.message_handler()
-async def check_fake_news(message: types.Message):
+@dp.message()
+async def check_fake_news(message: Message):
     user_input = message.text
 
     prompt = (
@@ -34,12 +37,15 @@ async def check_fake_news(message: types.Message):
         )
 
         result = response['choices'][0]['message']['content'].strip()
-        await message.reply(f"🤖 Fact Check Result:\n\n{result}")
+        await message.answer(f"🤖 Fact Check Result:\n\n{result}")
 
     except Exception as e:
-        await message.reply("❌ Error while checking the message. Please try again later.")
+        await message.answer("❌ Error while checking the message. Please try again later.")
         print(f"Error: {e}")
 
-if __name__ == '__main__':
+async def main():
     print("🤖 Bot is running...")
-    executor.start_polling(dp, skip_updates=True)
+    await dp.start_polling(bot)
+
+if __name__ == '__main__':
+    asyncio.run(main())
